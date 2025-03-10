@@ -38,6 +38,7 @@ body {
     background-size: cover;
     background-position: center;
     text-align: center;
+    color: white;
     padding: 5rem 2rem;
 }
 
@@ -79,6 +80,7 @@ body {
     border-radius: 8px;
     margin-top: 20px;
 }
+
 
 
 #services {
