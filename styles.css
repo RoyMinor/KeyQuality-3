@@ -24,7 +24,7 @@ body {
 }
 
 .navbar .nav-link {
-    color: white;
+    color: gold;
     transition: background-color 0.3s ease, text-decoration 0.3s ease;
 }
 
@@ -192,6 +192,30 @@ footer {
     padding: 1rem;
     margin-top: 2rem;
 }
+
+/* Custom CSS */
+.nav2  {
+    background-color: #343a40;
+    align-content: center;
+    justify-content: space-between;
+    padding: 1rem;
+}
+
+.nav2-brand img {
+    max-height: 50px;
+}
+
+.nav2 .nav-link2 {
+    color: white;
+    transition: background-color 0.3s ease, text-decoration 0.3s ease;
+}
+
+.nav2 .nav-link2:hover {
+    color: dodgerblue;
+    text-decoration: underline;
+}
+
+
 
 /* Responsive Design */
 @media (max-width: 768px) {
