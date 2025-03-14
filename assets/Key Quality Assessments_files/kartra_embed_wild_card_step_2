@@ -1,0 +1,165 @@
+var gdpr_cookie_banner_settings = {"display":false,"gdpr_active":false,"gdpr_cookie_banner_url":"","gdpr_privacy_banner_url":"","all_cookies_selected":true,"language_code":"en-GB","cookie_banner_html":"<!-- GDPR cookie BANNER -->\n<div class=\"gdpr_flapjack_banner js_gdpr_flapjack_banner lang-var-en-GB\" style=\"display: none;\">\n    <button type=\"button\" class=\"gdpr-uncollapse-button js_show_gdpr_banner\">\n        Cookies\n    <\/button>\n    <div class=\"container\">\n        <div class=\"row\">\n            <div class=\"col-12\">\n                <div class=\"grid-gdpr-banner\">\n                    <div>\n                        <div class=\"js_gdrp_cookie_banner_text gdpr-text\">\n                            <div>\n                                <div>\n                                    We use essential cookies for site functionality. If you reject optional cookies, only cookies necessary to provide you the services will be used. By clicking \"Accept All\", you agree to our:\n                                    <div class=\"gdpr-links\">\n                                        <a href=\"\" target=\"_blank\" class=\"\">\n                                            Cookie policy\n                                        <\/a>\n                                        <span><\/span>\n                                        <a href=\"https:\/\/kartra.com\/privacy-policy\/\" target=\"_blank\" class=\"\">\n                                            Kartra cookies\n                                        <\/a>\n                                    <\/div>\n                                <\/div>\n                                <div class=\"gdpr_link_wrapper\">\n                                    <a href=\"\" target=\"_blank\" class=\"js_gdpr_button\">\n                                        Privacy Policy\n                                    <\/a>\n                                <\/div>\n                            <\/div>\n                        <\/div>\n                    <\/div>\n                    <div class=\"gdpr_button_block\">\n                        <div>\n                            <button class=\"gdpr_decline_optional js_gdpr_accept\" type=\"button\" data-accept=\"required\" data-type=\"{asset_type}\" data-type-id=\"{asset_type_id}\" data-type-owner=\"{owner_hashed_id}\">\n                                Decline optional\n                            <\/button>\n                        <\/div>\n                        <div>\n                            <button class=\"gdpr_accept_all js_gdpr_accept\" type=\"button\" data-accept=\"all\" data-type=\"{asset_type}\" data-type-id=\"{asset_type_id}\" data-type-owner=\"{owner_hashed_id}\">\n                                Accept All\n                            <\/button>\n                        <\/div>\n                    <\/div>\n                    <div class=\"powered-by-text\">\n                        Powered by KARTRA\n                    <\/div>\n                <\/div>\n            <\/div>\n        <\/div>\n    <\/div>\n<\/div>\n<!--\/\/ GDPR cookie BANNER -->  \n"};
+
+jQuery(document).ready(function() {
+    //load old variables
+    if (jQuery('.js_gdpr_cookie_banner').length > 0) {
+        jQuery('.js_gdpr_cookie_banner').addClass('gdpr_flapjack_banner js_gdpr_flapjack_banner').removeClass('gdpr_cookie_banner js_gdpr_cookie_banner');
+    }
+
+    if (jQuery('.js_gdpr_flapjack_banner .js_gdpr_accept').length > 0) {
+        var $acceptButtons = jQuery('.js_gdpr_flapjack_banner .js_gdpr_accept').first();
+    } else {
+        // for already published pages
+        var $acceptButtons = jQuery('.js_gdpr_flapjack_banner .js_gdpr_close').first();
+    }
+
+    var assetType = $acceptButtons.attr('data-type');
+    var assetTypeId = $acceptButtons.attr('data-type-id');
+    var assetOwner = $acceptButtons.attr('data-type-owner');
+
+    jQuery('.js_gdpr_flapjack_banner').replaceWith(gdpr_cookie_banner_settings.cookie_banner_html);
+
+    //Assign them back to button
+    $acceptButtons = jQuery('.js_gdpr_flapjack_banner .js_gdpr_accept');
+
+    $acceptButtons.attr({
+        'data-type': assetType,
+        'data-type-id': assetTypeId,
+        'data-type-owner': assetOwner
+    });
+
+    if (gdpr_cookie_banner_settings.gdpr_active) {
+        var acceptedAllCookies = gdpr_cookie_banner_settings.all_cookies_selected;
+
+        if (acceptedAllCookies) {
+            grantFacebookConsent();
+        }
+
+        if (gdpr_cookie_banner_settings.display) {
+            jQuery('.js_gdpr_flapjack_banner').removeClass('collapsed');
+
+            setTimeout(function(){
+                jQuery('.js_gdpr_flapjack_banner').slideDown(300, function(){
+                    jQuery('.js_gdpr_flapjack_banner').css('overflow', '');
+                });
+
+                jQuery(document).trigger('kartra:gdprbanner:loaded');
+            }, 1000);
+        } else {
+            jQuery('.js_gdpr_flapjack_banner').addClass('collapsed');
+
+            setTimeout(function() {
+                jQuery('.js_gdpr_flapjack_banner').slideDown(300, function () {
+                    jQuery('.js_gdpr_flapjack_banner').css('overflow', '');
+                });
+
+                jQuery(document).trigger('kartra:gdprbanner:loaded');
+            }, 1000);
+        }
+    } else {
+        grantFacebookConsent();
+    }
+
+    jQuery('.js_show_gdpr_banner').on('click', function () {
+        jQuery('.js_gdpr_flapjack_banner').removeClass('collapsed');
+    });
+
+	jQuery('.js_gdpr_accept').on('click', function() {
+        jQuery('.js_gdpr_flapjack_banner').addClass('collapsed');
+
+        var $gdprAcceptButton = jQuery(this);
+        var acceptType = $gdprAcceptButton.attr('data-accept');
+        var assetType = $gdprAcceptButton.attr('data-type');
+        var assetTypeId = $gdprAcceptButton.attr('data-type-id');
+        var assetOwner = $gdprAcceptButton.attr('data-type-owner');
+
+        jQuery(document).trigger('kartra:gdprbanner:clicked');
+
+        if ('all' === acceptType) {
+            grantFacebookConsent();
+        } else {
+            if ('function' === typeof window.fbq) {
+                window.fbq('consent', 'revoke');
+            }
+        }
+
+        jQuery.ajax({
+            type: 'POST',
+            url: 'https://app.kartra.com/gdpr_settings/',
+            data: {
+                'asset_type': assetType,
+                'asset_type_id': assetTypeId,
+                'asset_owner': assetOwner,
+                'cookie_accepted': 'all' === acceptType ? 1 : 2,
+                'kuid': typeof window.kuuid !== 'undefined' ? window.kuuid : '',
+            },
+            xhrFields: {
+                withCredentials: true
+            }
+        })
+    });       
+});
+
+function grantFacebookConsent() {
+    var startTime = new Date();
+
+    var pollingForFacebookObject = setInterval(function() {
+        var now = new Date();
+        var passedTime = (now - startTime) / 1000;
+        var metaPixelExists = 'function' === typeof window.fbq;
+
+        if (
+            metaPixelExists
+            || passedTime >= 60
+        ) {
+            clearInterval(pollingForFacebookObject);
+
+            if (metaPixelExists) {
+                // Fix for Meta tracking pixel race conditions
+                try {
+                    if (fbq.queue) {
+                        var queueStartTime = new Date();
+
+                        var pollingForQueue = setInterval(function() {
+                            var queueNow = new Date();
+                            var queuePassed = (queueNow - queueStartTime) / 1000;
+                            var stillInGrantQueue = checkIfStillInQueue();
+
+                            window.fbq('consent', 'grant');
+
+                            if (
+                                !stillInGrantQueue
+                                || queuePassed >= 5
+                            ) {
+                                clearInterval(pollingForQueue);
+                            }
+                        }, 250);
+                    } else {
+                        setTimeout(function() {
+                            window.fbq('consent', 'grant');
+                        }, 5000);
+                    }
+                } catch {}
+
+                window.fbq('consent', 'grant');
+            }
+        }
+    }, 250);
+
+    function checkIfStillInQueue() {
+        var stillInQueue = false;
+
+        for (var i = 0; i < fbq.queue.length; i++) {
+            var args = fbq.queue[i];
+            var argumentsArray = Array.prototype.slice.call(args);
+
+            if (argumentsArray.indexOf('grant') !== -1) {
+                stillInQueue = true;
+
+                break;
+            }
+        }
+
+        return stillInQueue;
+    }
+}

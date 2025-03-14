@@ -1,0 +1,466 @@
+if (typeof window['kartra_tracking_loaded'] === 'undefined') {
+    window['kartra_tracking_loaded'] = true;
+    window['processed_assets'] = [];
+
+    (function(window){
+    var replaceUrl = false;
+    var url = new URL(window.location.href);
+    var searchParams = new URLSearchParams(url.search);
+
+    if ('undefined' === typeof window.kuuid) {
+        setUuidParam();
+    }
+
+    if ('undefined' === typeof window.kll) {
+        setKllParam();
+    }
+
+    if ('undefined' === typeof window.kref) {
+        setKrefParam();
+    }
+
+    setKaffParam();
+
+    if (replaceUrl) {
+        window.history.replaceState(
+            null,
+            null,
+            url.toString()
+        );
+    }
+
+    function getCookie(name) {
+        var cookieRegex = '(?:(?:^|.*; *)' + name + ' *= *([^;]*).*$)|^.*$';
+        var cookie = document.cookie.match(cookieRegex)[1];
+
+        if (cookie) {
+            return decodeURIComponent(cookie);
+        }
+    }
+
+    function setCookie(name, value, options) {
+        if (options && options.days) {
+            options['max-age'] = options.days * 60 * 60 * 24;
+
+            delete options.days;
+        }
+
+        var optionString = '';
+
+        Object.keys(options).map(function(key) {
+            optionString += '; ' + key + '=' + options[key];
+        });
+
+        document.cookie = name + '=' + encodeURIComponent(value) + optionString + "; path=/; domain=" + getMainDomain();
+    }
+
+    function getMainDomain() {
+        var parts = document.domain.split('.').reverse();
+        var mainDomain = parts[1] + '.' + parts[0];
+        return mainDomain;
+    }
+
+    function generateUUID() {
+        var d = new Date().getTime();
+        var d2 = (
+                'undefined' !== typeof performance
+                && performance.now
+                && (performance.now() * 1000)
+            )
+            || 0;
+
+        return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+            var r = Math.random() * 16;
+
+            if (d > 0) {
+                r = (d + r) % 16 | 0;
+                d = Math.floor(d / 16);
+            } else {
+                r = (d2 + r) % 16 | 0;
+                d2 = Math.floor(d2 / 16);
+            }
+
+            return (
+                c === 'x'
+                    ? r
+                    : (r & 0x3 | 0x8)
+            ).toString(16);
+        });
+    }
+
+    function generateKuuid() {
+        var uuid = generateUUID();
+        var currentUnixTimestamp = Math.floor(Date.now() / 1000);
+
+        return uuid + '-' + currentUnixTimestamp;
+    }
+
+    function isInIframe() {
+        try {
+            return window.self !== window.top;
+        } catch (e) {
+            return true;
+        }
+    }
+
+    function validateKuuid(uuid) {
+        // Explode the string by the dash
+        var segments = uuid.split('-');
+
+        // Check if the 6th segment exists & is a valid UNIX timestamp
+        if (
+            segments.length >= 6
+            && segments[5]
+        ) {
+            return isValidUnixTimestamp(segments[5]);
+        }
+
+        // If no 6th segment, check the current time against the threshold
+        var currentTimestamp = Math.floor(Date.now() / 1000); // Current UNIX timestamp in seconds
+        var thresholdTimestamp = 1728950400; // 15 Oct 2024 00:00:00 UNIX timestamp
+
+        // Validate if the current timestamp is before the threshold
+        return currentTimestamp < thresholdTimestamp;
+    }
+
+    function setUuidParam() {
+        var inIframe = isInIframe();
+        var uuid;
+
+        if (inIframe) {
+            if (searchParams.has('kuid')) {
+                uuid = searchParams.get('kuid');
+            } else {
+                uuid = getCookie('kuuid');
+            }
+        } else {
+            uuid = getCookie('kuuid');
+
+            if (!uuid) {
+                var kartraReferrer = searchParams.get('kref');
+                var kartraLid = searchParams.get('lid');
+
+                if (
+                    searchParams.has('kuid')
+                    && kartraReferrer
+                    && (
+                        document.referrer
+                        || kartraLid
+                    )
+                ) {
+                    uuid = searchParams.get('kuid');
+                }
+            }
+        }
+
+        if (
+            !uuid
+            || !validateKuuid(uuid)
+        ) {
+            uuid = generateKuuid();
+        }
+
+        window.kuuid = uuid;
+
+        if (searchParams.has('kuid')) {
+            url.searchParams.delete('kuid');
+
+            replaceUrl = true;
+        }
+    }
+
+    function setKllParam() {
+        var kll = getCookie('kll');
+
+        if (!kll) {
+            if (searchParams.has('kll')) {
+                kll = searchParams.get('kll');
+            }
+        }
+
+        window.kll = kll;
+
+        if (searchParams.has('kll')) {
+            url.searchParams.delete('kll');
+
+            replaceUrl = true;
+        }
+    }
+
+    function setKrefParam() {
+        var referrer;
+        var inIframe = isInIframe();
+
+        if (inIframe) {
+            if (searchParams.has('referrer')) {
+                referrer = searchParams.get('referrer');
+            }
+        } else {
+            referrer = (document.referrer && document.referrer.split('?')[0]) || '';
+        }
+
+        if (searchParams.has('kref')) {
+            referrer = searchParams.get('kref');
+            replaceUrl = true;
+            url.searchParams.delete('kref');
+        }
+
+        window.kref = referrer;
+    }
+
+    function setKaffParam() {
+        if (
+            searchParams.has('kaff')
+            && searchParams.has('kmid')
+        ) {
+            var affiliateHash = searchParams.get('kaff');
+            var memberHash = searchParams.get('kmid');
+            var cookieName = 'kaff_' + memberHash;
+
+            url.searchParams.delete('kaff');
+            url.searchParams.delete('kmid');
+
+            setCookie(
+                cookieName,
+                affiliateHash,
+                {
+                    path: '/',
+                    days: 30,
+                    secure: true,
+                    samesite: 'none',
+                }
+            );
+
+            replaceUrl = true;
+        }
+    }
+
+    function isValidUnixTimestamp(timestamp) {
+        var timestampInteger = parseInt(timestamp, 10);
+
+        return !isNaN(timestampInteger)
+            && timestampInteger > 0
+            && timestamp.length === 10;
+    }
+}(window));
+
+    if (window.addEventListener) {
+        window.addEventListener('load', initKartraTracking, false);
+    } else {
+        window.attachEvent('load', initKartraTracking);
+    }
+
+    function inIframe () {
+        try {
+            return window.self !== window.top;
+        } catch (e) {
+            return true;
+        }
+    }
+
+    // check if we need to track the analytics
+    function checkIsWhitelistedDomain() {
+        var url = '';
+        var whitelistedDomain = true;
+        var excludedLocations = [
+            'pages/all-pages/',
+            'memberships/all-memberships/',
+            '/load_template_for_screenshot/',
+            'load_form_for_screenshot/',
+            'contacts/forms/',
+
+        ];
+
+        if (inIframe()) {
+            try {
+                url = window.top.location.href;
+            } catch (e) {}
+        } else {
+            url = window.location.href;
+        }
+
+        if (url) {
+            excludedLocations.forEach(function (value) {
+                if (url.indexOf(value) !== -1) {
+                    whitelistedDomain = false;
+                }
+            });
+        }
+
+        return whitelistedDomain;
+    }
+
+    function initKartraTracking() {
+        var isWhitelistedDomain = checkIsWhitelistedDomain();
+
+        if (isWhitelistedDomain) {
+            loadAdvancedTracking();
+            setTimeout(loadTracking, 1000);
+        }
+    }
+
+    function loadTracking(container) {
+        var trackableElements;
+        var vendors = {};
+
+        if (typeof container === 'undefined') {
+            trackableElements = document.getElementsByClassName('js_kartra_trackable_object');
+        } else {
+            trackableElements = container.getElementsByClassName('js_kartra_trackable_object');
+        }
+
+        if (trackableElements.length > 0) {
+            for (var i = 0; i < trackableElements.length; i++) {
+                var assetType = trackableElements[i].getAttribute('data-kt-type');
+                var assetValue = trackableElements[i].getAttribute('data-kt-value');
+                var assetOwner = trackableElements[i].getAttribute('data-kt-owner');
+
+                /* Attribute not present move to next element */
+                if (
+                    assetType === null
+                    || assetValue == null
+                    || assetType === ''
+                    || assetValue === ''
+                ) {
+                    continue;
+                }
+
+                var parentWrapper = typeof container === 'undefined' && someParentHasTheClass(trackableElements[i], 'js_trackable_wrapper');
+
+                if (parentWrapper) {
+                    parentWrapper.addEventListener('kartra_show_hidden_asset', onShowHiddenAsset, false);
+                } else {
+                    if (window['processed_assets'].indexOf(assetValue) !== -1) {
+                        continue;
+                    }
+
+                    var trackableItem = 'kartra_trackable_items_' + assetOwner;
+                    var processedAsset = assetType + '|' + assetValue;
+
+                    window['processed_assets'].push(processedAsset);
+
+                    if (typeof window[trackableItem] === 'undefined') {
+                        window[trackableItem] = {};
+                    }
+
+                    if (typeof window[trackableItem][assetType] === 'undefined') {
+                        window[trackableItem][assetType] = [];
+                    }
+
+                    if (window[trackableItem][assetType].indexOf(assetValue) === -1) {
+                        window[trackableItem][assetType].push(assetValue);
+                    }
+
+                    if (typeof vendors[assetOwner] === 'undefined') {
+                        vendors[assetOwner] = [];
+                    }
+
+                    vendors[assetOwner] = window[trackableItem];
+                }
+            }
+
+            trackVendors(vendors);
+            window[trackableItem] = {};
+        }
+    }
+
+    function trackVendors(trackedVendors) {
+        var links = [];
+        var timeout = 0;
+        var detectedDevice = getDevice();
+        var isInIframe = inIframe();
+
+        Object.keys(trackedVendors).forEach(function(vendorHash) {
+            var trackingUrl = 'https://app.kartra.com/analytics/track/' + vendorHash + '?';
+
+            var trackingParameters = Object.keys(trackedVendors[vendorHash]).map(function(assetType) {
+                if (trackedVendors[vendorHash][assetType].length > 1) {
+                    var element = [];
+
+                    trackedVendors[vendorHash][assetType].forEach(function(trackingElement) {
+                        element.push(encodeURIComponent(assetType) + '[]=' + encodeURIComponent(trackingElement));
+                    });
+
+                    return element.join('&').trim('&');
+                } else {
+                    return encodeURIComponent(assetType) + '[]=' + encodeURIComponent(trackedVendors[vendorHash][assetType]);
+                }
+            }).join('&');
+
+            trackingUrl += trackingParameters;
+
+            // Add the device
+            trackingUrl += '&device=' + detectedDevice;
+
+            // Add the kuuid
+            trackingUrl += '&kuid=' + encodeURIComponent(window.kuuid);
+
+            links.push(trackingUrl);
+        });
+
+        if (isInIframe) {
+            timeout = 1000;
+        }
+
+        setTimeout(function() {
+            links.map(function(key) {
+                var img = document.createElement('img');
+
+                img.width = 1;
+                img.height = 1;
+                img.src = key;
+            });
+        }, timeout);
+    }
+
+    function someParentHasTheClass(element, classname) {
+        if (element.className && element.className.split(' ').indexOf(classname) >= 0) {
+            return element;
+        }
+
+        return element.parentNode && someParentHasTheClass(element.parentNode, classname);
+    }
+
+    function onShowHiddenAsset() {
+        loadTracking(this);
+    }
+
+    function getDevice() {
+        var deviceType = 'desktop';
+
+        if (document.documentElement.clientWidth < 767) {
+            deviceType = 'mobile';
+        } else if (document.documentElement.clientWidth < 1024) {
+            deviceType = 'tablet';
+        }
+
+        return deviceType;
+    }
+
+    function loadAdvancedTracking() {
+        var advancedScriptPath = 'https://app.kartra.com/js/build/front/analytics/track.js';
+        var advancedScriptExists = document.querySelectorAll('script[src="' + advancedScriptPath + '"]').length > 0;
+        var trackableElementsExist = document.getElementsByClassName('js_kartra_trackable_object').length > 0;
+
+        if (
+            trackableElementsExist &&
+            (
+                'undefined' === typeof window['kartra']
+                || 'undefined' === typeof window['kartra']['track']
+                || !advancedScriptExists
+            )
+        ) {
+            var script = document.createElement('script');
+
+            script.src = advancedScriptPath;
+            script.type = 'text/javascript';
+            script.async = true;
+
+            script.addEventListener('load', function () {
+                window.kartra.track.init();
+            });
+
+            document.body.appendChild(script);
+        }
+    }
+}
