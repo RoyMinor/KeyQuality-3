@@ -259,16 +259,16 @@ footer {
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
 }
 
-.card2-title {
+.card-title2 {
     margin-top: 0;
     font-size: 1.5rem;
     color: black;
 }
 
-.card2-body ul, .card2-body ol {
+.card-body2 ul, .card2-body ol {
     padding-left: 20px;
 }
-.card2-body li {
+.card-body2 li {
     margin-bottom: 10px;
 }
 
