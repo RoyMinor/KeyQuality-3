@@ -199,7 +199,11 @@ footer {
     margin: 0;
     font-family: Arial, sans-serif;
     line-height: 1.6;
-    background-color: #f8f9fa;
+    background-color: white;
+}
+
+.body2 h1 {
+    text-align: center;
 }
 
 .page-title {
@@ -210,7 +214,7 @@ footer {
 .page-content {
     margin: 0 auto;
     max-width: 800px;
-    padding: 2rem;
+    padding: 1rem;
 }
 
 
