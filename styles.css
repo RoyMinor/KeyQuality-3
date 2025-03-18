@@ -5,6 +5,10 @@
     padding: 0;
 }
 
+html {
+    scroll-behavior: smooth;
+}
+
 
 body {
     font-family: Arial, sans-serif;
@@ -85,7 +89,7 @@ body {
 
 /* About Section */
 #about {
-    background-color: blue;
+    background-color: goldenrod;
     color: white;
     padding: 4rem 2rem;
     text-align: center;
@@ -211,10 +215,12 @@ footer {
     margin-bottom: 2rem;
 }
 
-.page-content {
-    margin: 0 auto;
-    max-width: 800px;
-    padding: 1rem;
+.body2 .page-content {
+    font-size: 1.2rem;
+    font-style: italic;
+    margin-bottom: 30px;
+    text-align: center;
+    color: #555;
 }
 
 
@@ -320,6 +326,8 @@ footer {
     color: #34495e;
     margin-top: 30px;
     margin-bottom: 15px;
+    border-bottom: 2px solid #3498db;
+    padding-bottom: 10px;
 }
 
 .body3 p {
@@ -330,6 +338,7 @@ footer {
 .body3 ul, ol {
     margin-left: 20px;
     margin-bottom: 20px;
+    padding-left: 20px;
 }
 
 .body3 li {
@@ -351,6 +360,31 @@ footer {
     background-color: white;
     border-radius: 8px;
     box-shadow: 0 4 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Styling for cta / Call-To-Action section */
+.body3 .cta {
+    text-align: center;
+    margin-top: 30px;
+    padding: 20px;
+    background-color: #3498db;
+    color: #fff;
+    border-radius: 8px;
+}
+
+.body3 .cta a {
+    color: #fff;
+    text-decoration: underline;
+}
+
+.body3 .cta p {
+    margin: 0;
+    font-size: 1.2rem;
+}
+
+.body3 .cta a:hover {
+    color: gold;
+    text-decoration: underline;
 }
 
 
