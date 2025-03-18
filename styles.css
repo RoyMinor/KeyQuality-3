@@ -85,7 +85,7 @@ body {
 
 /* About Section */
 #about {
-    background-color: black;
+    background-color: blue;
     color: white;
     padding: 4rem 2rem;
     text-align: center;
@@ -296,6 +296,61 @@ footer {
     width: 100%;
     height: 200px;
     object-fit: cover;
+}
+
+/* Extra styling for Project Management / Consulting Page */
+.body3 {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    line-height: 1.6;
+    background-color: white;
+    padding: 20px;
+    color: #333;
+}
+
+.body3 h1 {
+    font-size: 2.5rem;
+    color: #2c3e50;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.body3 h3 {
+    font-size: 1.75rem;
+    color: #34495e;
+    margin-top: 30px;
+    margin-bottom: 15px;
+}
+
+.body3 p {
+    margin-bottom: 20px;
+    font-size: 1rem;
+}
+
+.body3 ul, ol {
+    margin-left: 20px;
+    margin-bottom: 20px;
+}
+
+.body3 li {
+    margin-bottom: 10px;
+}
+
+.body3 .page-content {
+    font-size: 1.2rem;
+    font-style: italic;
+    margin-bottom: 30px;
+    text-align: center;
+    color: #555;
+}
+
+.body3 .container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 4 10px rgba(0, 0, 0, 0.1);
 }
 
 
