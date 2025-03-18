@@ -209,6 +209,7 @@ footer {
 }
 
 .body2 h1 {
+    font-size: 2.5rem;
     text-align: center;
 }
 
@@ -222,6 +223,7 @@ footer {
     font-size: 1.2rem;
     font-style: italic;
     margin-bottom: 30px;
+    padding: 10px;
     text-align: center;
     color: #555;
 }
@@ -352,6 +354,7 @@ footer {
     font-size: 1.2rem;
     font-style: italic;
     margin-bottom: 30px;
+    padding: 10px;
     text-align: center;
     color: #555;
 }
