@@ -228,6 +228,13 @@ footer {
     color: #555;
 }
 
+.body2 .consult-img, img{
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 1rem;
+    align-items: center;
+}
+
 
 .nav2  {
     background-color: #343a40;
