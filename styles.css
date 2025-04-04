@@ -37,6 +37,13 @@ body {
     text-decoration: underline;
 }
 
+.nav-link.active {
+    background-color: gold;
+    color: black;
+    border-radius: 5px;
+    padding: 3px;
+}
+
 /* Hero Section */
 
 .custom-hero {
@@ -243,9 +250,12 @@ footer {
 
 .nav2  {
     background-color: #343a40;
+    text-decoration: none;
+    display: flex;
     align-content: center;
-    justify-content: space-between;
+    justify-content: center;
     padding: 1rem;
+    gap: 2rem;
 }
 
 .nav2-brand img {
@@ -260,6 +270,13 @@ footer {
 .nav2 .nav-link2:hover {
     color: dodgerblue;
     text-decoration: underline;
+}
+
+.nav-link2.active {
+    background-color: gold;
+    color: #333;
+    padding: 3px;
+    border-radius: 5px;
 }
 
 .card-container2 {
@@ -326,6 +343,13 @@ footer {
     background-color: #e0e0e0;
     /* border-bottom-left-radius: 12px;
     border-bottom-right-radius: 12px; */
+}
+
+.consult-img {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 2rem;
 }
 
 /* Extra styling for Project Management / Consulting Page */
