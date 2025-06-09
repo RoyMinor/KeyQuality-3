@@ -18,7 +18,7 @@
                 <img src="https://d11n7da8rpqbjy.cloudfront.net/dopepeoplewho/80859285380Logo.png" height="50" alt="Logo">
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon">B</span>
+                <span class="navbar-toggler-icon">Button</span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
@@ -106,6 +106,19 @@
     <script>
         document.getElementById('year').innerText = new Date().getFullYear();
     </script>
+    <script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const links = document.querySelectorAll(".navbar .nav-link");
+
+    links.forEach(link => {
+      link.addEventListener("click", function () {
+        links.forEach(l => l.classList.remove("active")); // remove from all
+        this.classList.add("active"); // add to clicked
+      });
+    });
+  });
+</script>
+
 
 </body>
 </html>
